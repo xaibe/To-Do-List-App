@@ -4,6 +4,7 @@ import { from, Observable } from 'rxjs';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { CreateUserDto } from '../models/dto/create-user.dto';
 import { UpdateUserDto } from '../models/dto/update-user.dto';
+import * as bcrypt from 'bcrypt';
 import { User } from '../models/user.entity';
 
 @Injectable()
@@ -38,5 +39,12 @@ export class UsersService {
     updateUserDto: UpdateUserDto,
   ): Observable<UpdateResult> {
     return from(this.userRepository.update(id, updateUserDto));
+  }
+
+  async hashpassword(user: any) {
+    const saltOrRounds = 10;
+    const hash = await bcrypt.hash(user.password, saltOrRounds);
+    user.password = hash;
+    return user;
   }
 }

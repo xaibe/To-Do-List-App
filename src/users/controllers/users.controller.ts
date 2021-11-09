@@ -25,7 +25,7 @@ import { UpdateUserDto } from '../models/dto/update-user.dto';
 import { User } from '../models/user.entity';
 import { UsersService } from '../services/users.service';
 
-@ApiTags('users')
+@ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
@@ -33,14 +33,14 @@ export class UsersController {
   @Public()
   @ApiBearerAuth()
   @ApiOkResponse({ type: User, isArray: true })
-  @Get('all')
+  @Get('FindAllUsers')
   getusers(): Observable<CreateUserDto[]> {
     return this.usersService.findAll();
   }
 
   @ApiOkResponse({ type: User })
   @ApiNotFoundResponse()
-  @Get(':id')
+  @Get('FindUserByid/:id')
   getUserById(
     @Param('id', ParseIntPipe) id: number,
   ): Observable<CreateUserDto> {
@@ -53,7 +53,7 @@ export class UsersController {
 
   @ApiBearerAuth()
   @ApiBadRequestResponse()
-  @Put('update/:id')
+  @Put('UpdateUserProfile/:id')
   updatefeed(
     @Param('id') id: number,
     @Body() updateUserDto: UpdateUserDto,
@@ -62,7 +62,7 @@ export class UsersController {
   }
 
   @ApiBadRequestResponse()
-  @Delete(':id')
+  @Delete('DelteUserProfile/:id')
   delete(@Param('id') id: number): Observable<DeleteResult> {
     return this.usersService.deleteUser(id);
   }
@@ -70,8 +70,11 @@ export class UsersController {
   @Public()
   @ApiCreatedResponse({ type: User })
   @ApiBadRequestResponse()
-  @Post('create')
-  create(@Body() body: CreateUserDto): Observable<CreateUserDto> {
-    return this.usersService.createUser(body);
+  @Post('RegisterUser')
+  async create(
+    @Body() body: CreateUserDto,
+  ): Promise<Observable<CreateUserDto>> {
+    const user = this.usersService.hashpassword(body);
+    return this.usersService.createUser(await user);
   }
 }
