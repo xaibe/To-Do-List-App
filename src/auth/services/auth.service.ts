@@ -10,7 +10,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
   ) {}
-  userid = ' ';
+  userid = null;
   loggedin = false;
 
   async validateUser(email: string, pass: string): Promise<any> {
@@ -24,7 +24,7 @@ export class AuthService {
         return result;
       }
     }
-
+    this.loggedin = false;
     return null;
   }
 
