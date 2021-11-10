@@ -20,12 +20,22 @@ export class ToDoListService {
     private authService: AuthService,
   ) {}
 
-  findAll(): Observable<ToDoList[]> {
+  async findAll(): Promise<ToDoList[]> {
     const userId = this.getuserid();
     if (userId) {
-      return from(this.todolistRepository.find({ where: { userId: userId } }));
+      const user = this.todolistRepository.find({
+        where: { userId: userId },
+      });
+
+      if (user) {
+        return user;
+      } else {
+        const message = 'You dont have any todo task';
+        throw new NotFoundException(message);
+      }
     } else {
-      throw new UnauthorizedException();
+      const message = 'please login first';
+      throw new UnauthorizedException(message);
     }
   }
 
@@ -74,7 +84,7 @@ export class ToDoListService {
         if (verifyuser) {
           return this.todolistRepository.delete(id);
         } else {
-          const message = 'you can not delte todo task of others';
+          const message = 'you can not delete todo task of others';
           throw new UnauthorizedException(message);
         }
       } else {
@@ -101,10 +111,30 @@ export class ToDoListService {
     }
   }
 
-  updatetodotask(
+  async updatetodotask(
     id: number,
     updateToDoListDto: UpdateToDoListDto,
-  ): Observable<UpdateResult> {
-    return from(this.todolistRepository.update(id, updateToDoListDto));
+  ): Promise<UpdateResult> {
+    const userId = this.getuserid();
+    if (userId) {
+      const task = this.todolistRepository.findOne({
+        where: { id: id },
+      });
+      if (await task) {
+        const verifyuser = this.matchuserid(userId, (await task).userId);
+        if (verifyuser) {
+          return this.todolistRepository.update(id, updateToDoListDto);
+        } else {
+          const message = 'you can not update todo task of others';
+          throw new UnauthorizedException(message);
+        }
+      } else {
+        const message = 'this todo task doesnot exist';
+        throw new NotFoundException(message);
+      }
+    } else {
+      const message = 'please login first';
+      throw new UnauthorizedException(message);
+    }
   }
 }

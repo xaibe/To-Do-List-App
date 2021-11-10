@@ -1,7 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
 export class UpdateToDoListDto {
-  @ApiProperty()
   userId: number;
   @ApiProperty()
   Title: string;
