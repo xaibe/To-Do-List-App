@@ -10,33 +10,29 @@ import { ToDoList } from '../models/todolist.entity';
 export class ToDoListService {
   constructor(
     @InjectRepository(ToDoList)
-    private readonly userRepository: Repository<ToDoList>,
+    private readonly todolistRepository: Repository<ToDoList>,
   ) {}
 
   findAll(): Observable<ToDoList[]> {
-    return from(this.userRepository.find());
+    return from(this.todolistRepository.find());
   }
 
-  findById(userId: number): Observable<ToDoList> {
-    return from(this.userRepository.findOne(userId));
+  findById(id: number): Observable<ToDoList> {
+    return from(this.todolistRepository.findOne(id));
   }
 
-  async findOne(email: string): Promise<ToDoList> {
-    return this.userRepository.findOne({ where: { email } });
+  createtodotask(createToDoListDto: CreateToDoListDto): Observable<ToDoList> {
+    return from(this.todolistRepository.save(createToDoListDto));
   }
 
-  createUser(CreateToDoListDto: CreateToDoListDto): Observable<ToDoList> {
-    return from(this.userRepository.save(CreateToDoListDto));
+  deletetodotask(id: number): Observable<DeleteResult> {
+    return from(this.todolistRepository.delete(id));
   }
 
-  deleteUser(id: number): Observable<DeleteResult> {
-    return from(this.userRepository.delete(id));
-  }
-
-  updateUser(
+  updatetodotask(
     id: number,
     updateToDoListDto: UpdateToDoListDto,
   ): Observable<UpdateResult> {
-    return from(this.userRepository.update(id, updateToDoListDto));
+    return from(this.todolistRepository.update(id, updateToDoListDto));
   }
 }
