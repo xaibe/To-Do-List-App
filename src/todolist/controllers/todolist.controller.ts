@@ -39,7 +39,7 @@ export class ToDoListController {
   @ApiBearerAuth()
   @ApiOkResponse({ type: ToDoList, isArray: true })
   @Get('all')
-  getusers(): Observable<CreateToDoListDto[]> {
+  getusers(): Promise<CreateToDoListDto[]> {
     return this.toDoListService.findAll();
   }
 
@@ -63,7 +63,7 @@ export class ToDoListController {
   updatefeed(
     @Param('id') id: number,
     @Body() updateUserDto: UpdateToDoListDto,
-  ): Observable<UpdateResult> {
+  ): Promise<UpdateResult> {
     return this.toDoListService.updatetodotask(id, updateUserDto);
   }
 
