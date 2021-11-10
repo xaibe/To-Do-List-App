@@ -2,10 +2,10 @@ import {
   Body,
   Controller,
   Delete,
+  Response,
   Get,
   NotFoundException,
   Param,
-  Request,
   ParseIntPipe,
   Post,
   Put,
@@ -39,18 +39,17 @@ export class ToDoListController {
   @ApiBearerAuth()
   @ApiOkResponse({ type: ToDoList, isArray: true })
   @Get('all')
-  getusers(@Request() req): Observable<CreateToDoListDto[]> {
-    const userid = this.authservice.getuserid();
-    console.log('got userid in todolist ', userid);
+  getusers(): Observable<CreateToDoListDto[]> {
     return this.toDoListService.findAll();
   }
 
   @ApiOkResponse({ type: ToDoList })
+  @ApiBearerAuth()
   @ApiNotFoundResponse()
   @Get(':id')
   getUserById(
     @Param('id', ParseIntPipe) id: number,
-  ): Observable<CreateToDoListDto> {
+  ): Promise<CreateToDoListDto> {
     const todolist = this.toDoListService.findById(id);
     if (!todolist) {
       throw new NotFoundException();
@@ -78,7 +77,14 @@ export class ToDoListController {
   @ApiCreatedResponse({ type: ToDoList })
   @ApiBadRequestResponse()
   @Post('create')
-  create(@Body() body: CreateToDoListDto): Observable<CreateToDoListDto> {
-    return this.toDoListService.createtodotask(body);
+  create(
+    @Response() res,
+    @Body() body: CreateToDoListDto,
+  ): Observable<CreateToDoListDto> {
+    const todolist = this.toDoListService.createtodotask(body);
+    if (!todolist) {
+      res.send('Please Login First');
+    }
+    return todolist;
   }
 }
