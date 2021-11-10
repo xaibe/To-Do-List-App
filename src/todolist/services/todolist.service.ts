@@ -63,8 +63,28 @@ export class ToDoListService {
     }
   }
 
-  deletetodotask(id: number): Observable<DeleteResult> {
-    return from(this.todolistRepository.delete(id));
+  async deletetodotask(id: number): Promise<DeleteResult> {
+    const userId = this.getuserid();
+    if (userId) {
+      const task = this.todolistRepository.findOne({
+        where: { id: id },
+      });
+      if (await task) {
+        const verifyuser = this.matchuserid(userId, (await task).userId);
+        if (verifyuser) {
+          return this.todolistRepository.delete(id);
+        } else {
+          const message = 'you can not delte todo task of others';
+          throw new UnauthorizedException(message);
+        }
+      } else {
+        const message = 'this todo task doesnot exist';
+        throw new NotFoundException(message);
+      }
+    } else {
+      const message = 'please login first';
+      throw new UnauthorizedException(message);
+    }
   }
 
   getuserid() {
