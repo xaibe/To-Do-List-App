@@ -5,17 +5,24 @@ export class ToDoList {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiProperty()
   @Column()
-  name: string;
+  userId: number;
 
   @ApiProperty()
   @Column()
-  email: string;
+  Title: string;
 
   @ApiProperty()
   @Column()
-  password: string;
+  Description: string;
+
+  @ApiProperty()
+  @Column()
+  EventType: string;
+
+  @ApiProperty()
+  @Column()
+  EventDateTime: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

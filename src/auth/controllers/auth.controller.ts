@@ -37,7 +37,7 @@ export class AuthController {
   @ApiCreatedResponse({ type: LoginUserDto })
   @ApiBadRequestResponse()
   @UseGuards(LocalAuthGuard)
-  @Post('auth/login')
+  @Post('login')
   async login(@Request() req, @Body() body: LoginUserDto) {
     return this.authService.login(req.user);
   }

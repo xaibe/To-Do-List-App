@@ -1,15 +1,18 @@
 /* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
-import { IsAlphanumeric, MaxLength } from 'class-validator';
 export class CreateToDoListDto {
   @ApiProperty()
-  @IsAlphanumeric()
-  @MaxLength(10)
-  name: string;
+  userId: number;
 
   @ApiProperty()
-  email: string;
+  Title: string;
 
   @ApiProperty()
-  password: string;
+  Description: string;
+
+  @ApiProperty()
+  EventType: string;
+
+  @ApiProperty()
+  EventDateTime: string;
 }
