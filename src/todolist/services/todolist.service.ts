@@ -27,11 +27,11 @@ export class ToDoListService {
         where: { userId: userId },
       });
 
-      if (user) {
-        return user;
-      } else {
+      if (user === null || (await user).length === 0) {
         const message = 'You dont have any todo task';
         throw new NotFoundException(message);
+      } else {
+        return user;
       }
     } else {
       const message = 'please login first';
