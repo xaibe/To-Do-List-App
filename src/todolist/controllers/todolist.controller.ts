@@ -67,9 +67,10 @@ export class ToDoListController {
     return this.toDoListService.updatetodotask(id, updateUserDto);
   }
 
+  @ApiBearerAuth()
   @ApiBadRequestResponse()
   @Delete(':id')
-  delete(@Param('id') id: number): Observable<DeleteResult> {
+  delete(@Param('id') id: number): Promise<DeleteResult> {
     return this.toDoListService.deletetodotask(id);
   }
 
