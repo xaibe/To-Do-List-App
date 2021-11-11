@@ -6,9 +6,12 @@ import {
   Get,
   NotFoundException,
   Param,
+  Request,
   ParseIntPipe,
   Post,
   Put,
+  UseGuards,
+  UnauthorizedException,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -26,6 +29,7 @@ import { UpdateToDoListDto } from '../models/dto/update-todolist.dto';
 import { ToDoList } from '../models/todolist.entity';
 import { ToDoListService } from '../services/todolist.service';
 import { AuthService } from 'src/auth/services/auth.service';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @ApiTags('todolist')
 @Controller('todolist')
@@ -44,17 +48,21 @@ export class ToDoListController {
   }
 
   @ApiOkResponse({ type: ToDoList })
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiNotFoundResponse()
   @Get(':id')
   getUserById(
+    @Request() req,
     @Param('id', ParseIntPipe) id: number,
   ): Promise<CreateToDoListDto> {
-    const todolist = this.toDoListService.findById(id);
-    if (!todolist) {
-      throw new NotFoundException();
+    const userid = req.user.userId;
+    if (userid) {
+      return this.toDoListService.findById(id, userid);
+    } else {
+      const message = 'please login first';
+      throw new UnauthorizedException(message);
     }
-    return todolist;
   }
 
   @ApiBearerAuth()
@@ -74,15 +82,19 @@ export class ToDoListController {
     return this.toDoListService.deletetodotask(id);
   }
 
-  @Public()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiCreatedResponse({ type: ToDoList })
   @ApiBadRequestResponse()
   @Post('create')
   create(
     @Response() res,
+    @Request() req,
     @Body() body: CreateToDoListDto,
-  ): Observable<CreateToDoListDto> {
-    const todolist = this.toDoListService.createtodotask(body);
+  ): Promise<CreateToDoListDto> {
+    // const userid = req.user.userId;
+    //const todolist = this.toDoListService.createtodotask(body, userid);
+    const todolist = this.toDoListService.createtodotask(body, req.user.userId);
     if (!todolist) {
       res.send('Please Login First');
     }

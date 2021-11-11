@@ -1,13 +1,27 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { ToDoList } from 'src/todolist/models/todolist.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 @Entity('user')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @OneToMany(() => ToDoList, (toDoList) => toDoList.user)
+  todolist: ToDoList;
+
   @ApiProperty()
   @Column()
-  name: string;
+  firstName: string;
+
+  @ApiProperty()
+  @Column()
+  lastName: string;
 
   @ApiProperty()
   @Column()
@@ -17,6 +31,6 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn()
   createdAt: Date;
 }

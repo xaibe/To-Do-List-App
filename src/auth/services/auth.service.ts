@@ -10,8 +10,8 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
   ) {}
-  userid = null;
   loggedin = false;
+  userid = null;
 
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.usersService.findOne(email);
@@ -32,7 +32,7 @@ export class AuthService {
     const payload = { username: user.name, sub: user.id };
     //saving user id
     this.userid = user.id;
-    console.log({ user, payload });
+    //  console.log({ user, payload });
     return {
       access_token: this.jwtService.sign(payload),
     };
@@ -40,7 +40,6 @@ export class AuthService {
 
   getuserid() {
     if (this.loggedin === true) {
-      console.log('getuseridcalled', this.userid);
       return this.userid;
     } else {
       console.log('user is not logged in');
@@ -48,7 +47,7 @@ export class AuthService {
   }
 
   async getProfile(user: any) {
-    console.log('user', user);
+    console.log('user in get profile', user);
 
     // async validate(payload: any)
     //   return { userId: payload.sub, username: payload.username };

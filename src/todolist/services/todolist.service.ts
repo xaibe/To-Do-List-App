@@ -21,6 +21,7 @@ export class ToDoListService {
   ) {}
 
   async findAll(): Promise<ToDoList[]> {
+    // const task = this.todolistRepository.findOne(id, { relations: ['user'] });
     const userId = this.getuserid();
     if (userId) {
       const user = this.todolistRepository.find({
@@ -39,16 +40,18 @@ export class ToDoListService {
     }
   }
 
-  async findById(id: number): Promise<ToDoList> {
-    const userId = this.getuserid();
-    if (userId) {
-      const user = this.todolistRepository.findOne({
-        where: { id: id },
+  async findById(id: number, userid: number): Promise<ToDoList> {
+    if (userid) {
+      const task = this.todolistRepository.findOne({
+        where: { id: id, userId: userid },
       });
-      if (await user) {
-        const verifyuser = this.matchuserid(userId, (await user).userId);
-        if (verifyuser) {
-          return user;
+
+      console.log('task', await task);
+      //const task = this.todolistRepository.findOne(id);
+      if (await task) {
+        const matchresult = this.matchuserid((await task).userId, userid);
+        if (matchresult) {
+          return task;
         } else {
           const message = 'you can not find todo task of others';
           throw new UnauthorizedException(message);
@@ -63,11 +66,13 @@ export class ToDoListService {
     }
   }
 
-  createtodotask(createToDoListDto: CreateToDoListDto): Observable<ToDoList> {
-    const userid = this.getuserid();
+  createtodotask(
+    createToDoListDto: CreateToDoListDto,
+    userid: number,
+  ): Promise<ToDoList> {
     if (userid) {
       createToDoListDto.userId = userid;
-      return from(this.todolistRepository.save(createToDoListDto));
+      return this.todolistRepository.save(createToDoListDto);
     } else {
       throw new ForbiddenException();
     }

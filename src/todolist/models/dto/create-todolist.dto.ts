@@ -4,14 +4,14 @@ export class CreateToDoListDto {
   userId: number;
 
   @ApiProperty()
-  Title: string;
+  title: string;
 
   @ApiProperty()
-  Description: string;
+  description: string;
 
   @ApiProperty()
-  EventType: string;
+  eventType: string;
 
   @ApiProperty()
-  EventDateTime: string;
+  eventDateTime: string;
 }
