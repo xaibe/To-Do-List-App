@@ -9,7 +9,6 @@ import { ToDoListModule } from './todolist/todolist.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.POSTGRES_HOST,

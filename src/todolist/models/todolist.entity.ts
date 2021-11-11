@@ -1,29 +1,44 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from 'src/users/models/user.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 @Entity('todolist')
 export class ToDoList {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @OneToMany(() => User, (user) => user.todolist, { onDelete: 'CASCADE' })
+  @JoinColumn()
+  user: User;
 
   @Column()
   userId: number;
 
   @ApiProperty()
   @Column()
-  Title: string;
+  title: string;
 
   @ApiProperty()
   @Column()
-  Description: string;
+  description: string;
 
   @ApiProperty()
   @Column()
-  EventType: string;
+  eventType: string;
 
   @ApiProperty()
   @Column()
-  EventDateTime: string;
+  eventDateTime: string;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn()
   createdAt: Date;
+
+  // @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  // createdAt: Date;
 }
