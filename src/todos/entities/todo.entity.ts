@@ -16,14 +16,14 @@ enum EventType {
   Anniversity = 'anniversity',
 }
 @Entity('todos')
-export class ToDo {
+export class toDo {
   @PrimaryGeneratedColumn()
   id: number;
 
   @ManyToOne(() => User, (user) => user.todo, { onDelete: 'CASCADE' })
   user: User;
 
-  @RelationId((todo: ToDo) => todo.user) // you need to specify target relation
+  @RelationId((todo: toDo) => todo.user) // you need to specify target relation
   userId: number;
 
   // @Column()

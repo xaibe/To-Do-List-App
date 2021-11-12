@@ -5,21 +5,21 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
-import { CreateToDoDto } from './dto/create-toDo.dto';
-import { UpdateToDoDto } from './dto/update-toDo.dto';
-import { ToDo } from './Entities/todo.entity';
-import { AuthService } from 'src/auth/auth.service';
+import { CreateToDoDto } from './dtos/create-toDo.dto';
+import { UpdateToDoDto } from './dtos/update-toDo.dto';
+import { toDo } from './Entities/todo.entity';
+import { AuthsService } from 'src/auth/auths.service';
 import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class ToDosService {
   constructor(
-    @InjectRepository(ToDo)
-    private readonly toDoRepository: Repository<ToDo>,
-    private authService: AuthService,
+    @InjectRepository(toDo)
+    private readonly toDoRepository: Repository<toDo>,
+    private authsService: AuthsService,
   ) {}
 
-  async findAll(userId: number): Promise<ToDo[]> {
+  async findAll(userId: number): Promise<toDo[]> {
     // const task = this.todolistRepository.findOne(id, { relations: ['user'] });
     if (userId) {
       const user = this.toDoRepository.find({
@@ -38,16 +38,16 @@ export class ToDosService {
     }
   }
 
-  async findById(id: number, userid: number): Promise<ToDo> {
-    if (userid) {
+  async findById(id: number, userId: number): Promise<toDo> {
+    if (userId) {
       const task = this.toDoRepository.findOne({
-        where: { id: id, userId: userid },
+        where: { id: id, userId: userId },
       });
 
       console.log('task', await task);
       //const task = this.todolistRepository.findOne(id);
       if (await task) {
-        const matchResult = this.matchUserId((await task).userId, userid);
+        const matchResult = this.matchUserId((await task).userId, userId);
         if (matchResult) {
           return task;
         } else {
@@ -64,15 +64,15 @@ export class ToDosService {
     }
   }
 
-  async createToDo(createToDoDto: CreateToDoDto, userid: number) {
-    console.log('userid', userid);
+  async createToDo(createToDoDto: CreateToDoDto, userId: number) {
+    console.log('userid', userId);
 
     // createToDoDto.userId = userid;
     // console.log('createdto after edit', createToDoDto);
     const { title, description, eventType, eventDateTime } = createToDoDto;
     const user = new User();
-    user.id = userid;
-    const todo = new ToDo();
+    user.id = userId;
+    const todo = new toDo();
     todo.title = title;
     todo.description = description;
     todo.eventType = eventType;
@@ -106,8 +106,8 @@ export class ToDosService {
     }
   }
 
-  private matchUserId(exist_userid: any, new_userid: any) {
-    if (exist_userid === new_userid) {
+  private matchUserId(existUserId: any, newUserId: any) {
+    if (existUserId === newUserId) {
       return true;
     } else {
       return false;

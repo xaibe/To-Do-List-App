@@ -18,11 +18,11 @@ import { LoginUserDto } from 'src/users/dtos/Login-user.dto';
 import { Public } from './constants';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { AuthService } from './auth.service';
+import { AuthsService } from './auths.service';
 @ApiTags('Auths')
 @Controller('auth')
-export class AuthController {
-  constructor(private authService: AuthService) {}
+export class AuthsController {
+  constructor(private authsService: AuthsService) {}
 
   @ApiCreatedResponse({ type: LoginUserDto })
   @ApiBadRequestResponse()
@@ -39,6 +39,6 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Request() req, @Body() body: LoginUserDto) {
-    return this.authService.login(req.user);
+    return this.authsService.login(req.user);
   }
 }

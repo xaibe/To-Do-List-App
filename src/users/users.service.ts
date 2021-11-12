@@ -24,10 +24,10 @@ export class UsersService {
     return this.userRepository.findOne({ where: { email } });
   }
 
-  async createUser(CreateUserDto: CreateUserDto): Promise<User> {
-    const hashedpassword = await this.hashpassword(CreateUserDto.password);
-    CreateUserDto.password = await hashedpassword;
-    return this.userRepository.save(CreateUserDto);
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
+    const hashedPassword = await this.hashPassword(createUserDto.password);
+    createUserDto.password = await hashedPassword;
+    return this.userRepository.save(createUserDto);
   }
 
   deleteUser(id: number): Promise<DeleteResult> {
@@ -38,9 +38,9 @@ export class UsersService {
     return this.userRepository.update(id, updateUserDto);
   }
 
-  private async hashpassword(pass: string) {
+  private async hashPassword(pass: string) {
     const saltOrRounds = 10;
     const hash = await bcrypt.hash(pass, saltOrRounds);
-    return await hash;
+    return hash;
   }
 }

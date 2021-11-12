@@ -4,8 +4,8 @@ import { AppController } from './app.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
-import { ToDosModule } from './toDo/todos.module';
+import { AuthModule } from './auth/auths.module';
+import { ToDosModule } from './todos/todos.module';
 
 @Module({
   imports: [

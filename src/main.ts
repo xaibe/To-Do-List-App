@@ -8,9 +8,9 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
   const config = new DocumentBuilder()
-    .setTitle('Nest API')
-    .setDescription('the description of the API')
-    .setVersion('1.0')
+    .setTitle('ToDolist')
+    .setDescription('We can do CRUD operations on todolists of Users')
+    .setVersion('1.5')
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);

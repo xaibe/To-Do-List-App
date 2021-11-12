@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ToDosController } from './todos.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ToDo } from './Entities/todo.entity';
+import { toDo } from './Entities/todo.entity';
 import { ToDosService } from './todos.service';
-import { AuthModule } from 'src/auth/auth.module';
+import { AuthModule } from 'src/auth/auths.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ToDo]), AuthModule],
+  imports: [TypeOrmModule.forFeature([toDo]), AuthModule],
   controllers: [ToDosController],
   providers: [ToDosService],
   exports: [ToDosService],

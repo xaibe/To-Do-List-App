@@ -20,31 +20,31 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { DeleteResult, UpdateResult } from 'typeorm';
-import { CreateToDoDto } from './dto/create-toDo.dto';
-import { UpdateToDoDto } from './dto/update-toDo.dto';
-import { ToDo } from './Entities/todo.entity';
+import { CreateToDoDto } from './dtos/create-toDo.dto';
+import { UpdateToDoDto } from './dtos/update-toDo.dto';
+import { toDo } from './Entities/todo.entity';
 import { ToDosService } from './todos.service';
-import { AuthService } from 'src/auth/auth.service';
+import { AuthsService } from 'src/auth/auths.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { GetToDoDto } from './dto/get-toDo.dto';
+import { GetToDoDto } from './dtos/get-toDo.dto';
 
 @ApiTags('todos')
 @Controller('todos')
 export class ToDosController {
   constructor(
-    private authservice: AuthService,
+    private authService: AuthsService,
     private toDoService: ToDosService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOkResponse({ type: ToDo, isArray: true })
+  @ApiOkResponse({ type: toDo, isArray: true })
   @Get('all')
   getAllToDos(@Request() req): Promise<CreateToDoDto[]> {
     return this.toDoService.findAll(req.user.userId);
   }
 
-  @ApiOkResponse({ type: ToDo })
+  @ApiOkResponse({ type: toDo })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiNotFoundResponse()
@@ -78,7 +78,7 @@ export class ToDosController {
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiCreatedResponse({ type: ToDo })
+  @ApiCreatedResponse({ type: toDo })
   @ApiBadRequestResponse()
   @Post('create')
   async createToDo(
