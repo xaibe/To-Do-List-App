@@ -15,15 +15,14 @@ import { AuthService } from 'src/auth/auth.service';
 export class ToDoService {
   constructor(
     @InjectRepository(ToDo)
-    private readonly todoRepository: Repository<ToDo>,
+    private readonly toDoRepository: Repository<ToDo>,
     private authService: AuthService,
   ) {}
 
-  async findAll(): Promise<ToDo[]> {
+  async findAll(userId: number): Promise<ToDo[]> {
     // const task = this.todolistRepository.findOne(id, { relations: ['user'] });
-    const userId = this.getuserid();
     if (userId) {
-      const user = this.todoRepository.find({
+      const user = this.toDoRepository.find({
         where: { userId: userId },
       });
 
@@ -41,15 +40,15 @@ export class ToDoService {
 
   async findById(id: number, userid: number): Promise<ToDo> {
     if (userid) {
-      const task = this.todoRepository.findOne({
+      const task = this.toDoRepository.findOne({
         where: { id: id, userId: userid },
       });
 
       console.log('task', await task);
       //const task = this.todolistRepository.findOne(id);
       if (await task) {
-        const matchresult = this.matchuserid((await task).userId, userid);
-        if (matchresult) {
+        const matchResult = this.matchUserId((await task).userId, userid);
+        if (matchResult) {
           return task;
         } else {
           const message = 'you can not find todo task of others';
@@ -65,28 +64,24 @@ export class ToDoService {
     }
   }
 
-  createtodotask(
-    createToDoListDto: CreateToDoDto,
-    userid: number,
-  ): Promise<ToDo> {
+  createToDo(createToDoDto: CreateToDoDto, userid: number): Promise<ToDo> {
     if (userid) {
-      createToDoListDto.userId = userid;
-      return this.todoRepository.save(createToDoListDto);
+      createToDoDto.userId = userid;
+      return this.toDoRepository.save(createToDoDto);
     } else {
       throw new ForbiddenException();
     }
   }
 
-  async deletetodotask(id: number): Promise<DeleteResult> {
-    const userId = this.getuserid();
+  async deleteToDo(id: number, userId: number): Promise<DeleteResult> {
     if (userId) {
-      const task = this.todoRepository.findOne({
+      const task = this.toDoRepository.findOne({
         where: { id: id },
       });
       if (await task) {
-        const verifyuser = this.matchuserid(userId, (await task).userId);
-        if (verifyuser) {
-          return this.todoRepository.delete(id);
+        const verifyUser = this.matchUserId(userId, (await task).userId);
+        if (verifyUser) {
+          return this.toDoRepository.delete(id);
         } else {
           const message = 'you can not delete todo task of others';
           throw new UnauthorizedException(message);
@@ -101,13 +96,7 @@ export class ToDoService {
     }
   }
 
-  getuserid() {
-    const userid = this.authService.getuserid();
-    console.log('got userid in todolist ', userid);
-    return userid;
-  }
-
-  matchuserid(exist_userid: any, new_userid: any) {
+  private matchUserId(exist_userid: any, new_userid: any) {
     if (exist_userid === new_userid) {
       return true;
     } else {
@@ -115,19 +104,19 @@ export class ToDoService {
     }
   }
 
-  async updatetodotask(
+  async updateToDo(
     id: number,
-    updateToDoListDto: UpdateToDoDto,
+    userId: number,
+    updateToDoDto: UpdateToDoDto,
   ): Promise<UpdateResult> {
-    const userId = this.getuserid();
     if (userId) {
-      const task = this.todoRepository.findOne({
+      const task = this.toDoRepository.findOne({
         where: { id: id },
       });
       if (await task) {
-        const verifyuser = this.matchuserid(userId, (await task).userId);
-        if (verifyuser) {
-          return this.todoRepository.update(id, updateToDoListDto);
+        const verifyUser = this.matchUserId(userId, (await task).userId);
+        if (verifyUser) {
+          return this.toDoRepository.update(id, updateToDoDto);
         } else {
           const message = 'you can not update todo task of others';
           throw new UnauthorizedException(message);

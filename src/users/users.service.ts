@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { from, Observable } from 'rxjs';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -13,37 +12,35 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  findAll(): Observable<User[]> {
-    return from(this.userRepository.find());
+  findAll(): Promise<User[]> {
+    return this.userRepository.find();
   }
 
-  findById(userId: number): Observable<User> {
-    return from(this.userRepository.findOne(userId));
+  findById(userId: number): Promise<User> {
+    return this.userRepository.findOne(userId);
   }
 
   async findOne(email: string): Promise<User> {
     return this.userRepository.findOne({ where: { email } });
   }
 
-  createUser(CreateUserDto: CreateUserDto): Observable<User> {
-    return from(this.userRepository.save(CreateUserDto));
+  async createUser(CreateUserDto: CreateUserDto): Promise<User> {
+    const hashedpassword = await this.hashpassword(CreateUserDto.password);
+    CreateUserDto.password = hashedpassword;
+    return this.userRepository.save(CreateUserDto);
   }
 
-  deleteUser(id: number): Observable<DeleteResult> {
-    return from(this.userRepository.delete(id));
+  deleteUser(id: number): Promise<DeleteResult> {
+    return this.userRepository.delete(id);
   }
 
-  updateUser(
-    id: number,
-    updateUserDto: UpdateUserDto,
-  ): Observable<UpdateResult> {
-    return from(this.userRepository.update(id, updateUserDto));
+  updateUser(id: number, updateUserDto: UpdateUserDto): Promise<UpdateResult> {
+    return this.userRepository.update(id, updateUserDto);
   }
 
-  async hashpassword(user: any) {
+  private async hashpassword(pass: string) {
     const saltOrRounds = 10;
-    const hash = await bcrypt.hash(user.password, saltOrRounds);
-    user.password = hash;
-    return user;
+    const hash = await bcrypt.hash(pass, saltOrRounds);
+    return await hash;
   }
 }

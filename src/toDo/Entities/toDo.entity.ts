@@ -14,7 +14,6 @@ export class ToDo {
   id: number;
 
   @OneToMany(() => User, (user) => user.todo, { onDelete: 'CASCADE' })
-  @JoinColumn()
   user: User;
 
   @Column()

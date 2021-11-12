@@ -20,7 +20,6 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Public } from 'src/auth/constants';
 import { DeleteResult, UpdateResult } from 'typeorm';
 import { CreateToDoDto } from './dto/create-toDo.dto';
 import { UpdateToDoDto } from './dto/update-toDo.dto';
@@ -37,12 +36,12 @@ export class ToDoController {
     private toDoService: ToDoService,
   ) {}
 
-  @Public()
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: ToDo, isArray: true })
   @Get('all')
-  getusers(): Promise<CreateToDoDto[]> {
-    return this.toDoService.findAll();
+  getUsers(@Request() req): Promise<CreateToDoDto[]> {
+    return this.toDoService.findAll(req.user.userId);
   }
 
   @ApiOkResponse({ type: ToDo })
@@ -66,18 +65,19 @@ export class ToDoController {
   @ApiBearerAuth()
   @ApiBadRequestResponse()
   @Put('update/:id')
-  updatefeed(
+  updateToDo(
+    @Request() req,
     @Param('id') id: number,
     @Body() updateUserDto: UpdateToDoDto,
   ): Promise<UpdateResult> {
-    return this.toDoService.updatetodotask(id, updateUserDto);
+    return this.toDoService.updateToDo(id, req.user.userId, updateUserDto);
   }
 
   @ApiBearerAuth()
   @ApiBadRequestResponse()
-  @Delete(':id')
-  delete(@Param('id') id: number): Promise<DeleteResult> {
-    return this.toDoService.deletetodotask(id);
+  @Delete('delete/:id')
+  deleteToDo(@Request() req, @Param('id') id: number): Promise<DeleteResult> {
+    return this.toDoService.deleteToDo(id, req.user.userId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -85,17 +85,11 @@ export class ToDoController {
   @ApiCreatedResponse({ type: ToDo })
   @ApiBadRequestResponse()
   @Post('create')
-  create(
+  createToDo(
     @Response() res,
     @Request() req,
     @Body() body: CreateToDoDto,
   ): Promise<CreateToDoDto> {
-    // const userid = req.user.userId;
-    //const todolist = this.toDoListService.createtodotask(body, userid);
-    const todolist = this.toDoService.createtodotask(body, req.user.userId);
-    if (!todolist) {
-      res.send('Please Login First');
-    }
-    return todolist;
+    return this.toDoService.createToDo(body, req.user.userId);
   }
 }
