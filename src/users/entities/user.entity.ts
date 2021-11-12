@@ -7,13 +7,13 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-@Entity('user')
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
   @OneToMany(() => ToDo, (toDo) => toDo.user)
-  todo: ToDo;
+  todo: ToDo[];
 
   @ApiProperty()
   @Column()
