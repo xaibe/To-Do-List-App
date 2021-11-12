@@ -4,7 +4,7 @@ import { AppController } from './app.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auths.module';
+import { AuthsModule } from './auth/auths.module';
 import { ToDosModule } from './todos/todos.module';
 
 @Module({
@@ -25,7 +25,7 @@ import { ToDosModule } from './todos/todos.module';
     ConfigModule.forRoot({ isGlobal: true }),
     UsersModule,
     ToDosModule,
-    AuthModule,
+    AuthsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

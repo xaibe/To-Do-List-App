@@ -39,6 +39,7 @@ export class ToDosService {
   }
 
   async findById(id: number, userId: number): Promise<toDo> {
+    console.log('entered find by ID and user id is', userId);
     if (userId) {
       const task = this.toDoRepository.findOne({
         where: { id: id, userId: userId },
