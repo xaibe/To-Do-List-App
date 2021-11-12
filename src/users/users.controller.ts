@@ -17,13 +17,12 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Observable } from 'rxjs';
 import { Public } from 'src/auth/constants';
 import { DeleteResult, UpdateResult } from 'typeorm';
-import { CreateUserDto } from '../models/dto/create-user.dto';
-import { UpdateUserDto } from '../models/dto/update-user.dto';
-import { User } from '../models/user.entity';
-import { UsersService } from '../services/users.service';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { UpdateUserDto } from './dtos/update-user.dto';
+import { User } from './entities/user.entity';
+import { UsersService } from './users.service';
 
 @ApiTags('Users')
 @Controller('users')
@@ -34,16 +33,14 @@ export class UsersController {
   @ApiBearerAuth()
   @ApiOkResponse({ type: User, isArray: true })
   @Get('FindAllUsers')
-  getusers(): Observable<CreateUserDto[]> {
+  getusers(): Promise<CreateUserDto[]> {
     return this.usersService.findAll();
   }
 
   @ApiOkResponse({ type: User })
   @ApiNotFoundResponse()
   @Get('FindUserByid/:id')
-  getUserById(
-    @Param('id', ParseIntPipe) id: number,
-  ): Observable<CreateUserDto> {
+  getUserById(@Param('id', ParseIntPipe) id: number): Promise<CreateUserDto> {
     const user = this.usersService.findById(id);
     if (!user) {
       throw new NotFoundException();
@@ -57,13 +54,13 @@ export class UsersController {
   updatefeed(
     @Param('id') id: number,
     @Body() updateUserDto: UpdateUserDto,
-  ): Observable<UpdateResult> {
+  ): Promise<UpdateResult> {
     return this.usersService.updateUser(id, updateUserDto);
   }
 
   @ApiBadRequestResponse()
   @Delete('DelteUserProfile/:id')
-  delete(@Param('id') id: number): Observable<DeleteResult> {
+  delete(@Param('id') id: number): Promise<DeleteResult> {
     return this.usersService.deleteUser(id);
   }
 
@@ -71,10 +68,7 @@ export class UsersController {
   @ApiCreatedResponse({ type: User })
   @ApiBadRequestResponse()
   @Post('RegisterUser')
-  async create(
-    @Body() body: CreateUserDto,
-  ): Promise<Observable<CreateUserDto>> {
-    const user = this.usersService.hashpassword(body);
-    return this.usersService.createUser(await user);
+  async create(@Body() body: CreateUserDto): Promise<CreateUserDto> {
+    return this.usersService.createUser(body);
   }
 }

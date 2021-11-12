@@ -1,30 +1,28 @@
 import {
-  ForbiddenException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { from, Observable } from 'rxjs';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
-import { CreateToDoListDto } from '../models/dto/create-todolist.dto';
-import { UpdateToDoListDto } from '../models/dto/update-todolist.dto';
-import { ToDoList } from '../models/todolist.entity';
-import { AuthService } from 'src/auth/services/auth.service';
+import { CreateToDoDto } from './dtos/create-toDo.dto';
+import { UpdateToDoDto } from './dtos/update-toDo.dto';
+import { toDo } from './Entities/todo.entity';
+import { AuthsService } from 'src/auth/auths.service';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
-export class ToDoListService {
+export class ToDosService {
   constructor(
-    @InjectRepository(ToDoList)
-    private readonly todolistRepository: Repository<ToDoList>,
-    private authService: AuthService,
+    @InjectRepository(toDo)
+    private readonly toDoRepository: Repository<toDo>,
+    private authsService: AuthsService,
   ) {}
 
-  async findAll(): Promise<ToDoList[]> {
+  async findAll(userId: number): Promise<toDo[]> {
     // const task = this.todolistRepository.findOne(id, { relations: ['user'] });
-    const userId = this.getuserid();
     if (userId) {
-      const user = this.todolistRepository.find({
+      const user = this.toDoRepository.find({
         where: { userId: userId },
       });
 
@@ -40,17 +38,17 @@ export class ToDoListService {
     }
   }
 
-  async findById(id: number, userid: number): Promise<ToDoList> {
-    if (userid) {
-      const task = this.todolistRepository.findOne({
-        where: { id: id, userId: userid },
+  async findById(id: number, userId: number): Promise<toDo> {
+    if (userId) {
+      const task = this.toDoRepository.findOne({
+        where: { id: id, userId: userId },
       });
 
       console.log('task', await task);
       //const task = this.todolistRepository.findOne(id);
       if (await task) {
-        const matchresult = this.matchuserid((await task).userId, userid);
-        if (matchresult) {
+        const matchResult = this.matchUserId((await task).userId, userId);
+        if (matchResult) {
           return task;
         } else {
           const message = 'you can not find todo task of others';
@@ -66,28 +64,34 @@ export class ToDoListService {
     }
   }
 
-  createtodotask(
-    createToDoListDto: CreateToDoListDto,
-    userid: number,
-  ): Promise<ToDoList> {
-    if (userid) {
-      createToDoListDto.userId = userid;
-      return this.todolistRepository.save(createToDoListDto);
-    } else {
-      throw new ForbiddenException();
-    }
+  async createToDo(createToDoDto: CreateToDoDto, userId: number) {
+    console.log('userid', userId);
+
+    // createToDoDto.userId = userid;
+    // console.log('createdto after edit', createToDoDto);
+    const { title, description, eventType, eventDateTime } = createToDoDto;
+    const user = new User();
+    user.id = userId;
+    const todo = new toDo();
+    todo.title = title;
+    todo.description = description;
+    todo.eventType = eventType;
+    todo.eventDateTime = eventDateTime;
+    todo.user = user;
+    const result = await this.toDoRepository.save(todo);
+    console.log('result after add', result);
+    return result;
   }
 
-  async deletetodotask(id: number): Promise<DeleteResult> {
-    const userId = this.getuserid();
+  async deleteToDo(id: number, userId: number): Promise<DeleteResult> {
     if (userId) {
-      const task = this.todolistRepository.findOne({
+      const task = this.toDoRepository.findOne({
         where: { id: id },
       });
       if (await task) {
-        const verifyuser = this.matchuserid(userId, (await task).userId);
-        if (verifyuser) {
-          return this.todolistRepository.delete(id);
+        const verifyUser = this.matchUserId(userId, (await task).userId);
+        if (verifyUser) {
+          return this.toDoRepository.delete(id);
         } else {
           const message = 'you can not delete todo task of others';
           throw new UnauthorizedException(message);
@@ -102,33 +106,27 @@ export class ToDoListService {
     }
   }
 
-  getuserid() {
-    const userid = this.authService.getuserid();
-    console.log('got userid in todolist ', userid);
-    return userid;
-  }
-
-  matchuserid(exist_userid: any, new_userid: any) {
-    if (exist_userid === new_userid) {
+  private matchUserId(existUserId: any, newUserId: any) {
+    if (existUserId === newUserId) {
       return true;
     } else {
       return false;
     }
   }
 
-  async updatetodotask(
+  async updateToDo(
     id: number,
-    updateToDoListDto: UpdateToDoListDto,
+    userId: number,
+    updateToDoDto: UpdateToDoDto,
   ): Promise<UpdateResult> {
-    const userId = this.getuserid();
     if (userId) {
-      const task = this.todolistRepository.findOne({
+      const task = this.toDoRepository.findOne({
         where: { id: id },
       });
       if (await task) {
-        const verifyuser = this.matchuserid(userId, (await task).userId);
-        if (verifyuser) {
-          return this.todolistRepository.update(id, updateToDoListDto);
+        const verifyUser = this.matchUserId(userId, (await task).userId);
+        if (verifyUser) {
+          return this.toDoRepository.update(id, updateToDoDto);
         } else {
           const message = 'you can not update todo task of others';
           throw new UnauthorizedException(message);

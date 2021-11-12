@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ToDoList } from 'src/todolist/models/todolist.entity';
+import { toDo } from 'src/todos/Entities/todo.entity';
 import {
   Column,
   CreateDateColumn,
@@ -7,13 +7,13 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-@Entity('user')
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToMany(() => ToDoList, (toDoList) => toDoList.user)
-  todolist: ToDoList;
+  @OneToMany(() => toDo, (toDo) => toDo.user)
+  todo: toDo[];
 
   @ApiProperty()
   @Column()

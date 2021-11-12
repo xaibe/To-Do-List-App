@@ -1,12 +1,12 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
-import { AuthService } from './auth/services/auth.service';
+import { AuthsService } from './auth/auths.service';
 
 @Controller()
 export class AppController {
   constructor(
     private readonly appService: AppService,
-    private authService: AuthService,
+    private authsService: AuthsService,
   ) {}
 
   @Get()
