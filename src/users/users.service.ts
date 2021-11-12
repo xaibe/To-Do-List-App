@@ -16,8 +16,8 @@ export class UsersService {
     return this.userRepository.find();
   }
 
-  findById(userId: number): Promise<User> {
-    return this.userRepository.findOne(userId);
+  findById(id: number): Promise<User> {
+    return this.userRepository.findOne(id);
   }
 
   async findOne(email: string): Promise<User> {
@@ -26,7 +26,7 @@ export class UsersService {
 
   async createUser(CreateUserDto: CreateUserDto): Promise<User> {
     const hashedpassword = await this.hashpassword(CreateUserDto.password);
-    CreateUserDto.password = hashedpassword;
+    CreateUserDto.password = await hashedpassword;
     return this.userRepository.save(CreateUserDto);
   }
 

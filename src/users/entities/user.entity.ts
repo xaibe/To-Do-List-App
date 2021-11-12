@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ToDo } from 'src/toDo/Entities/toDo.entity';
+import { ToDo } from 'src/toDo/Entities/todo.entity';
 import {
   Column,
   CreateDateColumn,

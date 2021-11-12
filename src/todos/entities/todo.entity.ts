@@ -7,6 +7,7 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  RelationId,
 } from 'typeorm';
 enum EventType {
   Birthday = 'birthday',
@@ -22,8 +23,11 @@ export class ToDo {
   @ManyToOne(() => User, (user) => user.todo, { onDelete: 'CASCADE' })
   user: User;
 
-  @Column()
+  @RelationId((todo: ToDo) => todo.user) // you need to specify target relation
   userId: number;
+
+  // @Column()
+  // userId: number;
 
   @ApiProperty()
   @Column({ length: 100 })
@@ -44,25 +48,10 @@ export class ToDo {
   })
   eventType: EventType;
 
-  //@IsEnum(EventType)
-  // @Column({ type: 'enum', length: 100 })
-  // @ApiProperty({
-  //   description: 'description of the eventType property',
-  //   enum: EventType,
-  // })
-  // eventType: EventType;
-
-  // @ApiProperty()
-  // @Column('int')
-  // eventType: EventType;
-
   @ApiProperty()
   @Column()
   eventDateTime: Date;
 
   @CreateDateColumn()
   createdAt: Date;
-
-  // @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  // createdAt: Date;
 }

@@ -10,7 +10,6 @@ import {
   Post,
   Put,
   UseGuards,
-  UnauthorizedException,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -23,24 +22,25 @@ import {
 import { DeleteResult, UpdateResult } from 'typeorm';
 import { CreateToDoDto } from './dto/create-toDo.dto';
 import { UpdateToDoDto } from './dto/update-toDo.dto';
-import { ToDo } from './Entities/toDo.entity';
-import { ToDoService } from './toDo.service';
+import { ToDo } from './Entities/todo.entity';
+import { ToDosService } from './todos.service';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { GetToDoDto } from './dto/get-toDo.dto';
 
-@ApiTags('todo')
-@Controller('todo')
-export class ToDoController {
+@ApiTags('todos')
+@Controller('todos')
+export class ToDosController {
   constructor(
     private authservice: AuthService,
-    private toDoService: ToDoService,
+    private toDoService: ToDosService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: ToDo, isArray: true })
   @Get('all')
-  getUsers(@Request() req): Promise<CreateToDoDto[]> {
+  getAllToDos(@Request() req): Promise<CreateToDoDto[]> {
     return this.toDoService.findAll(req.user.userId);
   }
 
@@ -49,20 +49,15 @@ export class ToDoController {
   @ApiBearerAuth()
   @ApiNotFoundResponse()
   @Get(':id')
-  getUserById(
+  getToDo(
     @Request() req,
     @Param('id', ParseIntPipe) id: number,
-  ): Promise<CreateToDoDto> {
-    const userid = req.user.userId;
-    if (userid) {
-      return this.toDoService.findById(id, userid);
-    } else {
-      const message = 'please login first';
-      throw new UnauthorizedException(message);
-    }
+  ): Promise<GetToDoDto> {
+    return this.toDoService.findById(id, req.user.userId);
   }
 
   @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @ApiBadRequestResponse()
   @Put('update/:id')
   updateToDo(
@@ -74,6 +69,7 @@ export class ToDoController {
   }
 
   @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @ApiBadRequestResponse()
   @Delete('delete/:id')
   deleteToDo(@Request() req, @Param('id') id: number): Promise<DeleteResult> {
@@ -85,11 +81,12 @@ export class ToDoController {
   @ApiCreatedResponse({ type: ToDo })
   @ApiBadRequestResponse()
   @Post('create')
-  createToDo(
-    @Response() res,
+  async createToDo(
+    // @Response() res,
     @Request() req,
     @Body() body: CreateToDoDto,
-  ): Promise<CreateToDoDto> {
-    return this.toDoService.createToDo(body, req.user.userId);
+  ) {
+    const todo = await this.toDoService.createToDo(body, req.user.userId);
+    return todo;
   }
 }

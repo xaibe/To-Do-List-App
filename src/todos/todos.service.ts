@@ -1,5 +1,4 @@
 import {
-  ForbiddenException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -8,11 +7,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { CreateToDoDto } from './dto/create-toDo.dto';
 import { UpdateToDoDto } from './dto/update-toDo.dto';
-import { ToDo } from './Entities/toDo.entity';
+import { ToDo } from './Entities/todo.entity';
 import { AuthService } from 'src/auth/auth.service';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
-export class ToDoService {
+export class ToDosService {
   constructor(
     @InjectRepository(ToDo)
     private readonly toDoRepository: Repository<ToDo>,
@@ -64,13 +64,23 @@ export class ToDoService {
     }
   }
 
-  createToDo(createToDoDto: CreateToDoDto, userid: number): Promise<ToDo> {
-    if (userid) {
-      createToDoDto.userId = userid;
-      return this.toDoRepository.save(createToDoDto);
-    } else {
-      throw new ForbiddenException();
-    }
+  async createToDo(createToDoDto: CreateToDoDto, userid: number) {
+    console.log('userid', userid);
+
+    // createToDoDto.userId = userid;
+    // console.log('createdto after edit', createToDoDto);
+    const { title, description, eventType, eventDateTime } = createToDoDto;
+    const user = new User();
+    user.id = userid;
+    const todo = new ToDo();
+    todo.title = title;
+    todo.description = description;
+    todo.eventType = eventType;
+    todo.eventDateTime = eventDateTime;
+    todo.user = user;
+    const result = await this.toDoRepository.save(todo);
+    console.log('result after add', result);
+    return result;
   }
 
   async deleteToDo(id: number, userId: number): Promise<DeleteResult> {

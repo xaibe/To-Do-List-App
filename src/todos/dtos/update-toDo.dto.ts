@@ -9,7 +9,6 @@ enum EventType {
   Anniversity = 'anniversity',
 }
 export class UpdateToDoDto {
-  userId: number;
   @ApiProperty()
   title: string;
 
