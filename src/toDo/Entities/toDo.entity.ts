@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from 'src/users/models/user.entity';
+import { User } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -8,12 +8,12 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-@Entity('todolist')
-export class ToDoList {
+@Entity('todos')
+export class ToDo {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToMany(() => User, (user) => user.todolist, { onDelete: 'CASCADE' })
+  @OneToMany(() => User, (user) => user.todo, { onDelete: 'CASCADE' })
   @JoinColumn()
   user: User;
 

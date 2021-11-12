@@ -14,11 +14,11 @@ import {
   ApiBearerAuth,
   ApiTags,
 } from '@nestjs/swagger';
-import { LoginUserDto } from 'src/users/models/dto/Login-user.dto';
-import { Public } from '../constants';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard';
-import { LocalAuthGuard } from '../guards/local-auth.guard';
-import { AuthService } from '../services/auth.service';
+import { LoginUserDto } from 'src/users/dtos/Login-user.dto';
+import { Public } from './constants';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { LocalAuthGuard } from './guards/local-auth.guard';
+import { AuthService } from './auth.service';
 @ApiTags('Auths')
 @Controller('auth')
 export class AuthController {

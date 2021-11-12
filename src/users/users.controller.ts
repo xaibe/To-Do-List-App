@@ -20,10 +20,10 @@ import {
 import { Observable } from 'rxjs';
 import { Public } from 'src/auth/constants';
 import { DeleteResult, UpdateResult } from 'typeorm';
-import { CreateUserDto } from '../models/dto/create-user.dto';
-import { UpdateUserDto } from '../models/dto/update-user.dto';
-import { User } from '../models/user.entity';
-import { UsersService } from '../services/users.service';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { UpdateUserDto } from './dtos/update-user.dto';
+import { User } from './entities/user.entity';
+import { UsersService } from './users.service';
 
 @ApiTags('Users')
 @Controller('users')
