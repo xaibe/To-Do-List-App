@@ -4,7 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { Between, DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { CreateToDoDto } from './dtos/create-toDo.dto';
 import { UpdateToDoDto } from './dtos/update-toDo.dto';
 import { toDo } from './Entities/todo.entity';
@@ -66,8 +66,6 @@ export class ToDosService {
   }
 
   async createToDo(createToDoDto: CreateToDoDto, userId: number) {
-    console.log('userid', userId);
-
     // createToDoDto.userId = userid;
     // console.log('createdto after edit', createToDoDto);
     const { title, description, eventType, eventDateTime } = createToDoDto;
@@ -79,18 +77,39 @@ export class ToDosService {
     todo.eventType = eventType;
     todo.eventDateTime = eventDateTime;
     todo.user = user;
-    const result = await this.toDoRepository.save(todo);
-    console.log('result after add', result);
-    return result;
+
+    //what are moments
+    const task = await this.toDoRepository.findOne({
+      where: {
+        eventDateTime: Between(todo.eventDateTime, todo.eventDateTime),
+      },
+    });
+
+    // todo.eventDateTime=
+    //   const task = await this.toDoRepository.findOne({
+    //    where: {
+    //     eventDateTime BETWEEN '2014-02-01' AND '2014-03-01' },
+    //  });
+
+    console.log('fetched task', task);
+    if (task) {
+      const message =
+        ' You already have todo for the same date & time! please change the task time';
+      throw new UnauthorizedException(message);
+    } else {
+      const result = await this.toDoRepository.save(todo);
+      console.log('result after add', result);
+      return result;
+    }
   }
 
   async deleteToDo(id: number, userId: number): Promise<DeleteResult> {
     if (userId) {
-      const task = this.toDoRepository.findOne({
+      const task = await this.toDoRepository.findOne({
         where: { id: id },
       });
-      if (await task) {
-        const verifyUser = this.matchUserId(userId, (await task).userId);
+      if (task) {
+        const verifyUser = this.matchUserId(userId, task.userId);
         if (verifyUser) {
           return this.toDoRepository.delete(id);
         } else {
