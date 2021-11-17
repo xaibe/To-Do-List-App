@@ -23,7 +23,7 @@ export class ToDosService {
     // const task = this.todolistRepository.findOne(id, { relations: ['user'] });
     if (userId) {
       const user = this.toDoRepository.find({
-        where: { userId: userId },
+        where: { user: userId },
       });
 
       if (user === null || (await user).length === 0) {
