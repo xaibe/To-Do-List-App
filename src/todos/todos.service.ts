@@ -41,14 +41,14 @@ export class ToDosService {
   async findById(id: number, userId: number): Promise<toDo> {
     console.log('entered find by ID and user id is', userId);
     if (userId) {
-      const task = this.toDoRepository.findOne({
-        where: { id: id, userId: userId },
+      const task = await this.toDoRepository.findOne({
+        where: { id: id, user: userId },
       });
 
-      console.log('task', await task);
+      console.log('task', task);
       //const task = this.todolistRepository.findOne(id);
-      if (await task) {
-        const matchResult = this.matchUserId((await task).userId, userId);
+      if (task) {
+        const matchResult = this.matchUserId(task.userId, userId);
         if (matchResult) {
           return task;
         } else {
