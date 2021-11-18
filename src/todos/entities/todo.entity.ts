@@ -8,6 +8,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   RelationId,
+  Timestamp,
 } from 'typeorm';
 enum EventType {
   Birthday = 'birthday',

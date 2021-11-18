@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum } from 'class-validator';
-
+import { Timestamp } from 'typeorm';
 enum EventType {
   Birthday = 'birthday',
   Meeting = 'meeting',
