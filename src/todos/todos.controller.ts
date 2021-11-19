@@ -39,7 +39,7 @@ export class ToDosController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: toDo, isArray: true })
-  @Get('all')
+  @Get()
   getAllToDos(@Request() req): Promise<CreateToDoDto[]> {
     return this.toDoService.findAll(req.user.userId);
   }
@@ -48,7 +48,7 @@ export class ToDosController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiNotFoundResponse()
-  @Get(':id')
+  @Get('/:id')
   getToDo(
     @Request() req,
     @Param('id', ParseIntPipe) id: number,
@@ -59,7 +59,7 @@ export class ToDosController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiBadRequestResponse()
-  @Put('update/:id')
+  @Put('/:id')
   updateToDo(
     @Request() req,
     @Param('id') id: number,
@@ -71,7 +71,7 @@ export class ToDosController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiBadRequestResponse()
-  @Delete('delete/:id')
+  @Delete('/:id')
   deleteToDo(@Request() req, @Param('id') id: number): Promise<DeleteResult> {
     return this.toDoService.deleteToDo(id, req.user.userId);
   }
@@ -80,7 +80,7 @@ export class ToDosController {
   @ApiBearerAuth()
   @ApiCreatedResponse({ type: toDo })
   @ApiBadRequestResponse()
-  @Post('create')
+  @Post()
   async createToDo(
     // @Response() res,
     @Request() req,

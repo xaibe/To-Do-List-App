@@ -10,6 +10,7 @@ import { JwtStrategy } from './Strategies/jwt.strategy';
 import { AuthsController } from './auths.controller';
 import { APP_GUARD } from '@nestjs/core/constants';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { UsersService } from 'src/users/users.service';
 
 @Module({
   imports: [

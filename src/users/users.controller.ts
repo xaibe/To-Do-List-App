@@ -3,11 +3,12 @@ import {
   Controller,
   Delete,
   Get,
-  NotFoundException,
+  Request,
   Param,
   ParseIntPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -18,8 +19,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Public } from 'src/auth/constants';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { DeleteResult, UpdateResult } from 'typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
+import { GetProfileDto } from './dtos/get-profile.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
@@ -32,25 +35,31 @@ export class UsersController {
   @Public()
   @ApiBearerAuth()
   @ApiOkResponse({ type: User, isArray: true })
-  @Get('FindAllUsers')
-  getusers(): Promise<CreateUserDto[]> {
+  @Get()
+  getusers(): Promise<GetProfileDto[]> {
     return this.usersService.findAll();
   }
 
   @ApiOkResponse({ type: User })
+  @ApiBadRequestResponse()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Get('me')
+  getProfile(@Request() req) {
+    return this.usersService.findById(req.user.userId);
+  }
+
+  @Public()
+  @ApiOkResponse({ type: User })
   @ApiNotFoundResponse()
-  @Get('FindUserByid/:id')
-  getUserById(@Param('id', ParseIntPipe) id: number): Promise<CreateUserDto> {
-    const user = this.usersService.findById(id);
-    if (!user) {
-      throw new NotFoundException();
-    }
-    return user;
+  @Get('/:id')
+  getUserById(@Param('id', ParseIntPipe) id: number): Promise<GetProfileDto> {
+    return this.usersService.findById(id);
   }
 
   @ApiBearerAuth()
   @ApiBadRequestResponse()
-  @Put('UpdateUserProfile/:id')
+  @Put('/:id')
   updatefeed(
     @Param('id') id: number,
     @Body() updateUserDto: UpdateUserDto,
@@ -58,8 +67,9 @@ export class UsersController {
     return this.usersService.updateUser(id, updateUserDto);
   }
 
+  @Public()
   @ApiBadRequestResponse()
-  @Delete('DelteUserProfile/:id')
+  @Delete('/:id')
   delete(@Param('id') id: number): Promise<DeleteResult> {
     return this.usersService.deleteUser(id);
   }
@@ -67,7 +77,7 @@ export class UsersController {
   @Public()
   @ApiCreatedResponse({ type: User })
   @ApiBadRequestResponse()
-  @Post('RegisterUser')
+  @Post()
   async create(@Body() body: CreateUserDto): Promise<CreateUserDto> {
     return this.usersService.createUser(body);
   }
