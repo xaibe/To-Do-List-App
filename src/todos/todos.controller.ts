@@ -10,6 +10,7 @@ import {
   Post,
   Put,
   UseGuards,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -27,6 +28,7 @@ import { ToDosService } from './todos.service';
 import { AuthsService } from 'src/auth/auths.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { GetToDoDto } from './dtos/get-toDo.dto';
+import { PatchToDoDto } from './dtos/patch-toDo.dto';
 
 @ApiTags('todos')
 @Controller('todos')
@@ -66,6 +68,18 @@ export class ToDosController {
     @Body() updateUserDto: UpdateToDoDto,
   ): Promise<UpdateResult> {
     return this.toDoService.updateToDo(id, req.user.userId, updateUserDto);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiBadRequestResponse()
+  @Patch('/:id/status')
+  patchToDo(
+    @Request() req,
+    @Param('id') id: number,
+    @Body() patchToDo: PatchToDoDto,
+  ): Promise<UpdateResult> {
+    return this.toDoService.patchToDo(id, req.user.userId, patchToDo);
   }
 
   @ApiBearerAuth()

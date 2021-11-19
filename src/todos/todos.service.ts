@@ -11,6 +11,7 @@ import { toDo } from './Entities/todo.entity';
 import { AuthsService } from 'src/auth/auths.service';
 import { User } from 'src/users/entities/user.entity';
 import * as moment from 'moment';
+import { PatchToDoDto } from './dtos/patch-toDo.dto';
 
 @Injectable()
 export class ToDosService {
@@ -153,6 +154,33 @@ export class ToDosService {
         const verifyUser = this.matchUserId(userId, (await task).userId);
         if (verifyUser) {
           return this.toDoRepository.update(id, updateToDoDto);
+        } else {
+          const message = 'you can not update todo task of others';
+          throw new UnauthorizedException(message);
+        }
+      } else {
+        const message = 'this todo task doesnot exist';
+        throw new NotFoundException(message);
+      }
+    } else {
+      const message = 'please login first';
+      throw new UnauthorizedException(message);
+    }
+  }
+
+  async patchToDo(
+    id: number,
+    userId: number,
+    patchToDoDto: PatchToDoDto,
+  ): Promise<UpdateResult> {
+    if (userId) {
+      const task = this.toDoRepository.findOne({
+        where: { id: id },
+      });
+      if (await task) {
+        const verifyUser = this.matchUserId(userId, (await task).userId);
+        if (verifyUser) {
+          return this.toDoRepository.update(id, patchToDoDto);
         } else {
           const message = 'you can not update todo task of others';
           throw new UnauthorizedException(message);
