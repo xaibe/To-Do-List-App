@@ -28,7 +28,7 @@ export class User {
   email: string;
 
   @ApiProperty()
-  @Column()
+  @Column({ select: false })
   password: string;
 
   @CreateDateColumn()

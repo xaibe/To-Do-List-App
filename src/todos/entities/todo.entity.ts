@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
@@ -8,14 +7,22 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   RelationId,
-  Timestamp,
 } from 'typeorm';
+
 enum EventType {
   Birthday = 'birthday',
   Meeting = 'meeting',
   Office_Task = 'office_Task',
   Anniversity = 'anniversity',
 }
+
+enum Status {
+  Completed = 'completed',
+  InProgress = 'inProgress',
+  Pending = 'pending',
+  Missed = 'missed',
+}
+
 @Entity('todos')
 export class toDo {
   @PrimaryGeneratedColumn()
@@ -26,9 +33,6 @@ export class toDo {
 
   @RelationId((todo: toDo) => todo.user) // you need to specify target relation
   userId: number;
-
-  // @Column()
-  // userId: number;
 
   @ApiProperty()
   @Column({ length: 100 })
@@ -48,6 +52,17 @@ export class toDo {
     enum: EventType,
   })
   eventType: EventType;
+
+  @Column({
+    type: 'enum',
+    enum: ['completed', 'inProgress', 'pending', 'missed'],
+    default: 'pending',
+  })
+  @ApiProperty({
+    description: 'we can add event status by using enum',
+    enum: Status,
+  })
+  status: Status;
 
   @ApiProperty()
   @Column()

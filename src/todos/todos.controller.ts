@@ -10,6 +10,7 @@ import {
   Post,
   Put,
   UseGuards,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -27,6 +28,7 @@ import { ToDosService } from './todos.service';
 import { AuthsService } from 'src/auth/auths.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { GetToDoDto } from './dtos/get-toDo.dto';
+import { PatchToDoDto } from './dtos/patch-toDo.dto';
 
 @ApiTags('todos')
 @Controller('todos')
@@ -39,7 +41,7 @@ export class ToDosController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: toDo, isArray: true })
-  @Get('all')
+  @Get()
   getAllToDos(@Request() req): Promise<CreateToDoDto[]> {
     return this.toDoService.findAll(req.user.userId);
   }
@@ -48,7 +50,7 @@ export class ToDosController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiNotFoundResponse()
-  @Get(':id')
+  @Get('/:id')
   getToDo(
     @Request() req,
     @Param('id', ParseIntPipe) id: number,
@@ -59,7 +61,7 @@ export class ToDosController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiBadRequestResponse()
-  @Put('update/:id')
+  @Put('/:id')
   updateToDo(
     @Request() req,
     @Param('id') id: number,
@@ -71,7 +73,19 @@ export class ToDosController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiBadRequestResponse()
-  @Delete('delete/:id')
+  @Patch('/:id/status')
+  patchToDo(
+    @Request() req,
+    @Param('id') id: number,
+    @Body() patchToDo: PatchToDoDto,
+  ): Promise<UpdateResult> {
+    return this.toDoService.patchToDo(id, req.user.userId, patchToDo);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiBadRequestResponse()
+  @Delete('/:id')
   deleteToDo(@Request() req, @Param('id') id: number): Promise<DeleteResult> {
     return this.toDoService.deleteToDo(id, req.user.userId);
   }
@@ -80,7 +94,7 @@ export class ToDosController {
   @ApiBearerAuth()
   @ApiCreatedResponse({ type: toDo })
   @ApiBadRequestResponse()
-  @Post('create')
+  @Post()
   async createToDo(
     // @Response() res,
     @Request() req,

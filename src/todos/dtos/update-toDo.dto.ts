@@ -1,7 +1,14 @@
 /* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum } from 'class-validator';
-import { Timestamp } from 'typeorm';
+import { isEnum, IsEnum } from 'class-validator';
+
+enum Status {
+  Completed = 'completed',
+  InProgress = 'inProgress',
+  Pending = 'pending',
+  Missed = 'missed',
+}
+
 enum EventType {
   Birthday = 'birthday',
   Meeting = 'meeting',
@@ -21,6 +28,13 @@ export class UpdateToDoDto {
     enum: EventType,
   })
   eventType: EventType;
+
+  @IsEnum(Status)
+  @ApiProperty({
+    description: 'we can add event status by using enum',
+    enum: Status,
+  })
+  status: Status;
 
   @ApiProperty()
   eventDateTime: Date;
