@@ -10,6 +10,7 @@ import { UpdateToDoDto } from './dtos/update-toDo.dto';
 import { toDo } from './Entities/todo.entity';
 import { AuthsService } from 'src/auth/auths.service';
 import { User } from 'src/users/entities/user.entity';
+import * as moment from 'moment';
 
 @Injectable()
 export class ToDosService {
@@ -78,10 +79,15 @@ export class ToDosService {
     todo.eventDateTime = eventDateTime;
     todo.user = user;
 
-    //what are moments
+    const endTime = moment(todo.eventDateTime).add(5, 'minutes').toDate();
+
+    const startTime = moment(todo.eventDateTime)
+      .subtract(5, 'minutes')
+      .toDate();
+
     const task = await this.toDoRepository.findOne({
       where: {
-        eventDateTime: Between(todo.eventDateTime, todo.eventDateTime),
+        eventDateTime: Between(startTime, endTime),
       },
     });
 
