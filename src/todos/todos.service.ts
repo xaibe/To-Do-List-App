@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -28,12 +29,7 @@ export class ToDosService {
         where: { user: userId },
       });
 
-      if (user === null || (await user).length === 0) {
-        const message = 'You dont have any todo task';
-        throw new NotFoundException(message);
-      } else {
-        return user;
-      }
+      return user;
     } else {
       const message = 'please login first';
       throw new UnauthorizedException(message);
@@ -66,10 +62,7 @@ export class ToDosService {
       throw new UnauthorizedException(message);
     }
   }
-
   async createToDo(createToDoDto: CreateToDoDto, userId: number) {
-    // createToDoDto.userId = userid;
-    // console.log('createdto after edit', createToDoDto);
     const { title, description, eventType, eventDateTime } = createToDoDto;
     const user = new User();
     user.id = userId;
@@ -85,28 +78,33 @@ export class ToDosService {
     const startTime = moment(todo.eventDateTime)
       .subtract(5, 'minutes')
       .toDate();
-
-    const task = await this.toDoRepository.findOne({
-      where: {
-        eventDateTime: Between(startTime, endTime),
-      },
-    });
-
-    // todo.eventDateTime=
-    //   const task = await this.toDoRepository.findOne({
-    //    where: {
-    //     eventDateTime BETWEEN '2014-02-01' AND '2014-03-01' },
-    //  });
-
-    console.log('fetched task', task);
-    if (task) {
-      const message =
-        ' You already have todo for the same date & time! please change the task time';
-      throw new UnauthorizedException(message);
+    //system date time
+    const dateNow = new Date();
+    //event datetime converted
+    const date = new Date(todo.eventDateTime);
+    if (date < dateNow) {
+      const message = 'This date is already passed! Please Enter A New One';
+      throw new ForbiddenException(message);
     } else {
-      const result = await this.toDoRepository.save(todo);
-      console.log('result after add', result);
-      return result;
+      const task = await this.toDoRepository.findOne({
+        where: {
+          eventDateTime: Between(startTime, endTime),
+        },
+      });
+
+      if (task) {
+        if (task.userId === user.id) {
+          const message =
+            ' You already have todo for the same date & time! please change the task time';
+          throw new UnauthorizedException(message);
+        } else {
+          const result = await this.toDoRepository.save(todo);
+          return result;
+        }
+      } else {
+        const result = await this.toDoRepository.save(todo);
+        return result;
+      }
     }
   }
 

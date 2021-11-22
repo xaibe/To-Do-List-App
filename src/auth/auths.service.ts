@@ -1,5 +1,10 @@
 /* eslint-disable prettier/prettier */
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -7,6 +12,7 @@ import * as bcrypt from 'bcrypt';
 @Injectable()
 export class AuthsService {
   constructor(
+    // @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
     private jwtService: JwtService,
   ) {}
@@ -19,6 +25,7 @@ export class AuthsService {
   async authenticateUser(email: string, password: string) {
     return this.usersService.validateUser(email, password);
   }
+
   async login(user: any) {
     const payload = { username: user.firstName + user.lastName, sub: user.id };
     //saving user id    this.userid = user.id;
