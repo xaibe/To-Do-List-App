@@ -13,12 +13,14 @@ import { AuthsService } from 'src/auth/auths.service';
 import { User } from 'src/users/entities/user.entity';
 import * as moment from 'moment';
 import { PatchToDoDto } from './dtos/patch-toDo.dto';
+import { TodosRepository } from './repositories/todos.repositories';
 
 @Injectable()
 export class ToDosService {
   constructor(
-    @InjectRepository(toDo)
-    private readonly toDoRepository: Repository<toDo>,
+    // @InjectRepository(toDo)
+    // private readonly toDoRepository: Repository<toDo>,
+    private readonly toDoRepository: TodosRepository,
     private authsService: AuthsService,
   ) {}
 
