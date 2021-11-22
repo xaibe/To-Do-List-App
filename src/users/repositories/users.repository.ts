@@ -14,12 +14,12 @@ export class UsersRepository extends Repository<User> {
         .getOne();
       if (userr) {
         const isMatch = await this.comparePassword(pass, userr.password);
+
         if (!isMatch) {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           throw new UnauthorizedException('Email/password incorrect');
         }
         const { password, ...user } = userr;
-        console.log('user in auth.service', user);
         return user;
       }
     } catch (ex) {
@@ -32,7 +32,8 @@ export class UsersRepository extends Repository<User> {
     userPassword: string,
   ): Promise<any> {
     try {
-      return bcrypt.compare(password, userPassword);
+      const result = await bcrypt.compare(password, userPassword);
+      return result;
     } catch (ex) {
       throw ex;
     }

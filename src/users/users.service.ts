@@ -1,4 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Delete,
+  ForbiddenException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { DeleteResult, UpdateResult } from 'typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -7,7 +13,9 @@ import { User } from './entities/user.entity';
 import { UsersRepository } from './repositories/users.repository';
 @Injectable()
 export class UsersService {
-  constructor(private readonly userRepository: UsersRepository) {}
+  constructor(
+    private readonly userRepository: UsersRepository, // @Inject(forwardRef(() => AuthsService)) // private authsService: AuthsService,
+  ) {}
 
   findAll(): Promise<User[]> {
     return this.userRepository.find();
@@ -25,17 +33,31 @@ export class UsersService {
     return this.userRepository.validateUser(email, password);
   }
 
-  async createUser(createUserDto: CreateUserDto): Promise<User> {
-    const hashedPassword = await this.hashPassword(createUserDto.password);
-    createUserDto.password = await hashedPassword;
-    return this.userRepository.save(createUserDto);
-  }
-
   deleteUser(id: number): Promise<DeleteResult> {
     return this.userRepository.delete(id);
   }
 
-  updateUser(id: number, updateUserDto: UpdateUserDto): Promise<UpdateResult> {
+  async createUser(createUserDto: CreateUserDto): Promise<any> {
+    const user = await this.findOne(createUserDto.email);
+    if (user) {
+      const message = 'this email is already registered';
+      throw new ForbiddenException(message);
+    } else {
+      const hashedPassword = await this.hashPassword(createUserDto.password);
+      createUserDto.password = hashedPassword;
+      const createdUser = await this.userRepository.save(createUserDto);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...usser } = createdUser;
+      return usser;
+    }
+  }
+
+  async updateUser(
+    id: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UpdateResult> {
+    const hashedPassword = await this.hashPassword(updateUserDto.password);
+    updateUserDto.password = await hashedPassword;
     return this.userRepository.update(id, updateUserDto);
   }
 

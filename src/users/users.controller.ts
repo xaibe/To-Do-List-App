@@ -73,12 +73,4 @@ export class UsersController {
   delete(@Param('id') id: number): Promise<DeleteResult> {
     return this.usersService.deleteUser(id);
   }
-
-  @Public()
-  @ApiCreatedResponse({ type: User })
-  @ApiBadRequestResponse()
-  @Post()
-  async create(@Body() body: CreateUserDto): Promise<CreateUserDto> {
-    return this.usersService.createUser(body);
-  }
 }

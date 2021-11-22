@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
-import { IsAlphanumeric, MaxLength } from 'class-validator';
+import { IsAlphanumeric, IsEmail, IsString, MaxLength } from 'class-validator';
 export class CreateUserDto {
   @ApiProperty()
   @IsAlphanumeric()
@@ -10,9 +10,10 @@ export class CreateUserDto {
   @ApiProperty()
   lastName: string;
 
+  @IsEmail()
   @ApiProperty()
   email: string;
 
-  @ApiProperty()
+  @IsString()
   password: string;
 }
