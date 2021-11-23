@@ -7,6 +7,9 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Role } from '../role.enum';
+import { Roles } from '../roles.decorator';
+
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
@@ -24,12 +27,15 @@ export class User {
   lastName: string;
 
   @ApiProperty()
-  @Column()
+  @Column({ unique: true })
   email: string;
 
   @ApiProperty()
   @Column({ select: false })
   password: string;
+
+  @Column({ default: Role.User })
+  roles: Role;
 
   @CreateDateColumn()
   createdAt: Date;
