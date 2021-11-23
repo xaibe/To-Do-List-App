@@ -24,6 +24,8 @@ import { publicDecrypt } from 'crypto';
 import { User } from 'src/users/entities/user.entity';
 import { CreateUserDto } from 'src/users/dtos/create-user.dto';
 import { UsersService } from 'src/users/users.service';
+import { Role } from 'src/users/role.enum';
+import { Roles } from 'src/users/roles.decorator';
 @ApiTags('Auths')
 @Controller('auth')
 export class AuthsController {
@@ -33,18 +35,34 @@ export class AuthsController {
   ) {}
 
   @Public()
-  @Post('login')
-  async login(@Body() body: LoginUserDto): Promise<any> {
+  @Post('login-user')
+  async loginUser(@Body() body: LoginUserDto): Promise<any> {
     return this.authsService.validateUser(body.email, body.password);
+  }
+
+  @Public()
+  @Post('login-admin')
+  async loginAdmin(@Body() body: LoginUserDto): Promise<any> {
+    return this.authsService.validateAdmin(body.email, body.password);
   }
 
   @Public()
   @ApiCreatedResponse({ type: User })
   @ApiBadRequestResponse()
-  @Post()
-  async create(@Body() body: CreateUserDto): Promise<any> {
+  @Post('user')
+  async createUser(@Body() body: CreateUserDto): Promise<any> {
     const user = await this.usersService.createUser(body);
-    const loginUser = await this.authsService.login(user);
+    const loginUser = await this.authsService.loginUser(user);
+    return loginUser;
+  }
+
+  @Public()
+  @ApiCreatedResponse({ type: User })
+  @ApiBadRequestResponse()
+  @Post('admin')
+  async createAdmin(@Body() body: CreateUserDto): Promise<any> {
+    const user = await this.usersService.createAdminUser(body);
+    const loginUser = await this.authsService.loginAdmin(user);
     return loginUser;
   }
 }

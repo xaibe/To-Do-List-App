@@ -20,11 +20,14 @@ import {
 } from '@nestjs/swagger';
 import { Public } from 'src/auth/constants';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { DeleteResult, UpdateResult } from 'typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { GetProfileDto } from './dtos/get-profile.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { User } from './entities/user.entity';
+import { Role } from './role.enum';
+import { Roles } from './roles.decorator';
 import { UsersService } from './users.service';
 
 @ApiTags('Users')
@@ -67,8 +70,10 @@ export class UsersController {
     return this.usersService.updateUser(id, updateUserDto);
   }
 
-  @Public()
   @ApiBadRequestResponse()
+  @ApiBearerAuth()
+  @Roles(Role.Admin)
+  @UseGuards(RolesGuard)
   @Delete('/:id')
   delete(@Param('id') id: number): Promise<DeleteResult> {
     return this.usersService.deleteUser(id);

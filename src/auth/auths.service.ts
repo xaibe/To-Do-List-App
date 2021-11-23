@@ -18,7 +18,7 @@ export class AuthsService {
   ) {}
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.usersService.validateUser(email, pass);
-    const newUser = this.login(user);
+    const newUser = this.loginUser(user);
     return newUser;
   }
 
@@ -26,8 +26,35 @@ export class AuthsService {
     return this.usersService.validateUser(email, password);
   }
 
-  async login(user: any) {
-    const payload = { username: user.firstName + user.lastName, sub: user.id };
+  async loginUser(user: any) {
+    const payload = {
+      username: user.firstName + user.lastName,
+      sub: user.id,
+      role: user.roles,
+    };
+    console.log('payload', payload);
+    //saving user id    this.userid = user.id;
+    //  console.log({ user, payload });
+    return {
+      access_token: this.jwtService.sign(payload),
+      user,
+    };
+  }
+  async validateAdmin(email: string, pass: string): Promise<any> {
+    const user = await this.usersService.validateAdmin(email, pass);
+    const newUser = this.loginAdmin(user);
+    return newUser;
+  }
+
+  async loginAdmin(user: any) {
+    console.log('user', user);
+
+    const payload = {
+      username: user.firstName + user.lastName,
+      sub: user.id,
+      role: user.roles,
+    };
+    console.log('payload', payload);
     //saving user id    this.userid = user.id;
     //  console.log({ user, payload });
     return {
